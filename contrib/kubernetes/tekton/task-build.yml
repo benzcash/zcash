@@ -1,0 +1,60 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  generateName: zcashd-build-
+spec:
+  workspaces:
+    - name: venv
+      emptyDir: {}
+  resources:
+    inputs:
+      - name: source
+        resourceSpec:
+          type: git
+          params:
+            - name: revision
+              value: tekton-task-build
+            - name: url
+              value: https://github.com/benzcash/zcash.git
+  taskSpec:
+    resources:
+      inputs:
+        - name: source
+          type: git
+    workspaces:
+        - name: venv
+          mountPath: /venv
+    steps:
+      - name: setup-venv
+        image: electriccoinco/bb-worker-debian10-build:latest
+        script: |
+          #!/bin/bash
+          set -e -o pipefail
+          pwd
+          ls -al
+          whoami
+          python3 -m venv /venv/zcash-build-venv
+          source /venv/zcash-build-venv/bin/activate
+          python -m pip install -r source/contrib/ci-workers-docker/requirements.txt
+      - name: pyflakes
+        image: electriccoinco/bb-worker-debian10-build:latest
+        script: |
+          #!/bin/bash
+          set -e -o pipefail
+          source /venv/zcash-build-venv/bin/activate
+          pwd
+          ls -l
+          cd source
+          pyflakes src zcutil
+      - name: build
+        image: electriccoinco/bb-worker-debian10-build:latest
+        script: |
+          #!/bin/bash
+          set -e -o pipefail
+          cd source
+          pwd
+          ls -la
+          ./zcutil/build.sh -j8
+      
+          
