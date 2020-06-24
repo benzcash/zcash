@@ -89,10 +89,10 @@ def change_branchid(filename):
 
 def main():
     net_magic_file = "./../../src/chainparams.cpp"
-    net_branchid_file = "./../../src/consensus/upgrades.cpp"
+    #net_branchid_file = "./../../src/consensus/upgrades.cpp"
 
     change_net_magic(net_magic_file)
-    change_branchid(net_branchid_file)
+    #change_branchid(net_branchid_file)
     print("Zcash testnet-in-a-box staging complete.")
 
 if __name__ == "__main__":
