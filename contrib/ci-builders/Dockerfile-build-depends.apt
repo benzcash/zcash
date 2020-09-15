@@ -1,0 +1,12 @@
+ARG FROMBASEOS
+ARG FROMBASEOS_BUILD_TAG
+FROM electriccoinco/zcashd-build:$FROMBASEOS$FROMBASEOS_BUILD_TAG
+ARG DEBIAN_FRONTEND=noninteractive
+ARG ZCASH_TAG
+
+RUN git clone --depth 1 --branch $ZCASH_TAG https://github.com/zcash/zcash.git \
+  /workspace/zcash
+WORKDIR /workspace/zcash/depends
+RUN make
+RUN make HOST=x86_64-w64-mingw32
+RUN make HOST=x86_64-apple-darwin16
